@@ -1,6 +1,6 @@
-version: 1.0
-name: metrics-apb
-description: Installs a metrics service based on Prometheus and Grafana
+version: 1.4
+name: ali08-metrics-apb
+description: Installs a metrics service based on Prometheus and Grafana ali08
 bindable: False
 async: optional
 tags:
@@ -16,7 +16,7 @@ plans:
     description: This plan sets up Prometheus and Grafana for metrics and data visualisation
     free: True
     metadata: {}
-    parameters: 
+    parameters:
       - name: GRAFANA_STORAGE_SIZE
         required: True
         default: 10
@@ -43,4 +43,3 @@ plans:
         type: string
         required: False
         title: Postgres Password
-        

@@ -138,11 +138,11 @@
   retries: 30
   delay: 5
 
-- name: Wait for app-metrics health endpoint to report healthy
-  uri:
-    url: http://{{ app_metrics_route.route.spec.host }}/healthz
-    status_code: 200
-  register: app_metrics_health
-  until: app_metrics_health.status == 200
-  retries: 30
-  delay: 5
+#- name: Wait for app-metrics health endpoint to report healthy
+#  uri:
+#    url: http://{{ app_metrics_route.route.spec.host }}/healthz
+#    status_code: 200
+#  register: app_metrics_health
+#  until: app_metrics_health.status == 200
+#  retries: 30
+#  delay: 5
