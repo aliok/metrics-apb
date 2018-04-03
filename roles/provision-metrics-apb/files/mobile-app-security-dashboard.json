@@ -2,7 +2,6 @@
   "annotations": {
     "list": [
       {
-        "$$hashKey": "object:87",
         "builtIn": 1,
         "datasource": "-- Grafana --",
         "enable": true,
@@ -13,12 +12,19 @@
       }
     ]
   },
-  "editable": true,
+  "editable": false,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 4,
-  "iteration": 1522745075718,
-  "links": [],
+  "links": [
+    {
+      "icon": "external link",
+      "keepTime": true,
+      "tags": [
+        "mobile-services"
+      ],
+      "type": "dashboards"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -796,22 +802,19 @@
   "refresh": false,
   "schemaVersion": 16,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "mobile-security-metrics"
+  ],
   "templating": {
     "list": [
       {
         "allValue": "'%'",
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
         "datasource": "Postgres",
         "hide": 0,
         "includeAll": true,
         "label": "App",
         "multi": false,
         "name": "appId",
-        "options": [],
         "query": "select distinct data->'app'->>'appId' from mobileappmetrics where event_type='security';",
         "refresh": 2,
         "regex": "",
@@ -824,17 +827,12 @@
       },
       {
         "allValue": "'%'",
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
         "datasource": "Postgres",
         "hide": 0,
         "includeAll": true,
         "label": "Platform",
         "multi": false,
         "name": "platform",
-        "options": [],
         "query": "select distinct data->'device'->>'platform' from mobileappmetrics where event_type='security';",
         "refresh": 2,
         "regex": "",
@@ -847,17 +845,12 @@
       },
       {
         "allValue": "'%'",
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
         "datasource": "Postgres",
         "hide": 0,
         "includeAll": true,
         "label": "Check Type",
         "multi": false,
         "name": "checkType",
-        "options": [],
         "query": "select distinct (all_checks.chk->>'name') from (select jsonb_array_elements(data->'security') chk from mobileAppMetrics WHERE $__timeFilter(event_time) AND event_type='security') as all_checks;",
         "refresh": 2,
         "regex": "",
@@ -943,8 +936,8 @@
     ]
   },
   "time": {
-    "from": "2018-04-03T06:57:17.226Z",
-    "to": "2018-04-03T07:04:03.637Z"
+    "from": "now/d",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -972,6 +965,6 @@
     ]
   },
   "timezone": "",
-  "title": "Mobile Security Metrics 3",
-  "version": 18
+  "title": "Mobile Security Metrics",
+  "version": 1
 }
