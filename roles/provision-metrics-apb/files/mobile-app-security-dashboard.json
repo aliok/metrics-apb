@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 4,
-  "iteration": 1522742327073,
+  "iteration": 1522745075718,
   "links": [],
   "panels": [
     {
@@ -441,7 +441,6 @@
       "strokeWidth": 1,
       "targets": [
         {
-          "$$hashKey": "object:330",
           "alias": "",
           "expr": "",
           "format": "time_series",
@@ -533,7 +532,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "$$hashKey": "object:179",
           "alias": "",
           "expr": "",
           "format": "time_series",
@@ -615,7 +613,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "$$hashKey": "object:385",
           "alias": "",
           "expr": "",
           "format": "time_series",
@@ -697,7 +694,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "$$hashKey": "object:510",
           "alias": "",
           "expr": "",
           "format": "time_series",
@@ -743,110 +739,14 @@
       ]
     },
     {
-      "aliasColors": {},
-      "cacheTimeout": null,
-      "combine": {
-        "label": "Others",
-        "threshold": 0
-      },
-      "datasource": "Postgres",
-      "fontSize": "80%",
-      "format": "short",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 23
-      },
-      "id": 4,
-      "interval": null,
-      "legend": {
-        "percentage": true,
-        "show": true,
-        "sort": null,
-        "sortDesc": null,
-        "values": true
-      },
-      "legendType": "Right side",
-      "links": [],
-      "maxDataPoints": 3,
-      "nullPointMode": "connected",
-      "pieType": "pie",
-      "strokeWidth": 1,
-      "targets": [
-        {
-          "alias": "",
-          "format": "time_series",
-          "hide": false,
-          "rawSql": "select now() as time, sum(passed) as passed, sum(not_passed) as not_passed\nfrom (SELECT event_time as time,\n  (select sum(case when (sec->>'passed')::boolean then 1 else 0 end)\n  from jsonb_array_elements(data->'security') as sec) as passed,\n  (select sum(case when (sec->>'passed')::boolean then 0 else 1 end)\n  from jsonb_array_elements(data->'security') as sec) as not_passed\nFROM mobileAppMetrics) as t\nWHERE $__timeFilter(time)",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "title": "Totals",
-      "type": "grafana-piechart-panel",
-      "valueName": "current"
-    },
-    {
-      "aliasColors": {},
-      "cacheTimeout": null,
-      "combine": {
-        "label": "Others",
-        "threshold": 0
-      },
-      "datasource": "Postgres",
-      "fontSize": "80%",
-      "format": "short",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 23
-      },
-      "id": 39,
-      "interval": null,
-      "legend": {
-        "percentage": true,
-        "show": true,
-        "sort": null,
-        "sortDesc": null,
-        "values": true
-      },
-      "legendType": "Right side",
-      "links": [],
-      "maxDataPoints": 3,
-      "nullPointMode": "connected",
-      "pieType": "pie",
-      "strokeWidth": 1,
-      "targets": [
-        {
-          "alias": "",
-          "format": "time_series",
-          "hide": false,
-          "rawSql": "select now() as time, platform as metric, sum(case when passed then 1 else 0 end) as passed\nfrom (\n  select s.clientId, platform, passed from \n  (\n    select * from (\n      select clientId, jsonb_array_elements(data->'security') as sec\n      FROM mobileAppMetrics\n      where $__timeFilter(event_time)\n    ) as securityRecords,\n    jsonb_to_record(sec) as x(name text, passed boolean)\n  ) AS s\n  INNER JOIN (\n    SELECT DISTINCT clientId, data->'device'->>'platform' as platform\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n  ) as a ON (s.clientId = a.clientId)\n) as t\ngroup by metric",
-          "refId": "A"
-        },
-        {
-          "alias": "",
-          "format": "time_series",
-          "rawSql": "select now() as time, platform || ' not passed' as metric, sum(case when passed then 0 else 1 end) as passed\nfrom (\n  select s.clientId, platform, passed from \n  (\n    select * from (\n      select clientId, jsonb_array_elements(data->'security') as sec\n      FROM mobileAppMetrics\n      where $__timeFilter(event_time)\n    ) as securityRecords,\n    jsonb_to_record(sec) as x(name text, passed boolean)\n  ) AS s\n  INNER JOIN (\n    SELECT DISTINCT clientId, data->'device'->>'platform' as platform\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n  ) as a ON (s.clientId = a.clientId)\n) as t\ngroup by metric",
-          "refId": "B"
-        }
-      ],
-      "timeFrom": null,
-      "title": "Totals per Platform [App: $appId]",
-      "type": "grafana-piechart-panel",
-      "valueName": "current"
-    },
-    {
       "columns": [],
       "datasource": "Postgres",
       "fontSize": "100%",
       "gridPos": {
         "h": 9,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 31
+        "y": 23
       },
       "id": 37,
       "links": [],
@@ -854,7 +754,7 @@
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 0,
+        "col": 6,
         "desc": true
       },
       "styles": [
@@ -883,283 +783,14 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "select client, appId as app, appVersion as \"version\", sdkVersion, platformVersion, sum(not_passed) as failed_checks from\n(\n  select s.clientId as client,\n  (\n    select sum(case when (sec->>'passed')::boolean then 0 else 1 end)\n      from jsonb_array_elements(s.data->'security') as sec\n  ) as not_passed,\n  a.*\n  from mobileAppMetrics AS s\n  INNER JOIN (\n    SELECT DISTINCT ON (clientId)\n    clientId,\n    data->'app'->>'appId' as appId,\n    data->'app'->>'appVersion' as appVersion,\n    data->'app'->>'sdkVersion' as sdkVersion,\n    data->'device'->>'platform' as platform,\n    data->'device'->>'platformVersion' as platformVersion\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n    and data->'device'->>'platform' like $platform\n  ) as a ON (s.clientId = a.clientId)\n  WHERE $__timeFilter(s.event_time)\n) as t\ngroup by client, appId, appVersion, sdkVersion, platformVersion\nORDER BY sum(not_passed) DESC\nLIMIT 10",
+          "hide": false,
+          "rawSql": "SELECT\n    latestEntryInTimeRange.clientId as \"Client Id\",\n    latestEntryInTimeRange.data->'app'->>'appId' as \"App\",\n    latestEntryInTimeRange.data->'app'->>'appVersion' as \"App Version\",\n    latestEntryInTimeRange.data->'app'->>'sdkVersion' as \"SDK Version\",\n    latestEntryInTimeRange.data->'device'->'platform' as \"Platform\",\n    latestEntryInTimeRange.data->'device'->>'platformVersion' as \"Platform Version\",\n    failCount as \"Fail Count\"\nFROM\n(\n  SELECT clientId, count(*) as failCount\n  FROM\n    (SELECT\n        clientId,\n        jsonb_array_elements(data->'security') as entry\n      FROM mobileAppMetrics\n      WHERE $__timeFilter(event_time)\n        AND event_type='security'\n        AND data ? 'security'\n        AND data ? 'app' AND data->'app' ? 'appId' and data->'app'->>'appId' like $appId\n        AND data ? 'device' AND data->'device' ? 'platform' and data->'device'->>'platform' like $platform\n    ) as checks\n  WHERE checks.entry->>'passed' = 'false'\n    AND checks.entry->>'name' like $checkType\n  GROUP BY clientId\n  ORDER BY failCount desc\n  LIMIT 10\n) clientFails\nJOIN\n(\n  select entry.clientId, entry.event_time, entry.data\n    from mobileAppMetrics entry\n    inner join\n      (select clientId, max(event_time) as latestEntryTime\n        from mobileAppMetrics\n        WHERE $__timeFilter(event_time)\n          and event_type='security'\n        group by clientId\n      )\n      latestEntry\n      on entry.clientId = latestEntry.clientId and entry.event_time = latestEntryTime\n      where event_type='security'\n) latestEntryInTimeRange\nON clientFails.clientId = latestEntryInTimeRange.clientId\nORDER BY \"Fail Count\" desc;",
           "refId": "A"
         }
       ],
       "title": "Top Offending Clients",
       "transform": "table",
       "type": "table"
-    },
-    {
-      "aliasColors": {},
-      "cacheTimeout": null,
-      "combine": {
-        "label": "Others",
-        "threshold": 0
-      },
-      "datasource": "Postgres",
-      "fontSize": "80%",
-      "format": "short",
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 31
-      },
-      "id": 33,
-      "interval": null,
-      "legend": {
-        "percentage": true,
-        "show": true,
-        "sort": null,
-        "sortDesc": null,
-        "values": true
-      },
-      "legendType": "Right side",
-      "links": [],
-      "maxDataPoints": 3,
-      "nullPointMode": "connected",
-      "pieType": "pie",
-      "strokeWidth": 1,
-      "targets": [
-        {
-          "alias": "",
-          "format": "time_series",
-          "hide": false,
-          "rawSql": "select now() as time, name as metric, sum(case when passed then 1 else 0 end) as passed\nfrom (\n  select s.clientId, name, passed from \n  (\n    select * from (\n      select clientId, jsonb_array_elements(data->'security') as sec\n      FROM mobileAppMetrics\n      where $__timeFilter(event_time)\n    ) as securityRecords,\n    jsonb_to_record(sec) as x(name text, passed boolean)\n  ) AS s\n  INNER JOIN (\n    SELECT DISTINCT clientId\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n    and data->'device'->>'platform' like $platform\n  ) as a ON (s.clientId = a.clientId)\n) as t\ngroup by metric",
-          "refId": "A"
-        },
-        {
-          "alias": "",
-          "format": "time_series",
-          "rawSql": "select now() as time, name || ' not passed' as metric, sum(case when passed then 0 else 1 end) as passed\nfrom (\n  select s.clientId, name, passed from \n  (\n    select * from (\n      select clientId, jsonb_array_elements(data->'security') as sec\n      FROM mobileAppMetrics\n      where $__timeFilter(event_time)\n    ) as securityRecords,\n    jsonb_to_record(sec) as x(name text, passed boolean)\n  ) AS s\n  INNER JOIN (\n    SELECT DISTINCT clientId\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n    and data->'device'->>'platform' like $platform\n  ) as a ON (s.clientId = a.clientId)\n) as t\ngroup by metric",
-          "refId": "B"
-        }
-      ],
-      "timeFrom": null,
-      "title": "Totals per Check Type",
-      "type": "grafana-piechart-panel",
-      "valueName": "current"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 40
-      },
-      "id": 26,
-      "panels": [],
-      "repeat": "platform",
-      "scopedVars": {
-        "platform": {
-          "selected": false,
-          "text": "android",
-          "value": "android"
-        }
-      },
-      "title": "Details [Platform: $platform, App: $appId]",
-      "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Postgres",
-      "fill": 3,
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 41
-      },
-      "id": 47,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "scopedVars": {
-        "platform": {
-          "selected": false,
-          "text": "android",
-          "value": "android"
-        }
-      },
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": true,
-      "targets": [
-        {
-          "alias": "",
-          "format": "time_series",
-          "rawSql": "select event_time as time, sum(passed) as passed, sum(not_passed) as not_passed\nfrom (\n  SELECT event_time,\n  (select sum(case when (sec->>'passed')::boolean then 1 else 0 end)\n  from jsonb_array_elements(data->'security') as sec) as passed,\n  (select sum(case when (sec->>'passed')::boolean then 0 else 1 end)\n  from jsonb_array_elements(data->'security') as sec) as not_passed\n  FROM mobileAppMetrics as s\n  INNER JOIN (\n    SELECT DISTINCT clientId\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n    and data->'device'->>'platform' like $platform\n  ) as a ON (s.clientId = a.clientId)\n  where $__timeFilter(event_time)\n) as check_counts\ngroup by event_time",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Metrics History",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ]
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 49
-      },
-      "id": 58,
-      "panels": [],
-      "repeat": null,
-      "repeatIteration": 1522742327073,
-      "repeatPanelId": 26,
-      "scopedVars": {
-        "platform": {
-          "selected": false,
-          "text": "ios",
-          "value": "ios"
-        }
-      },
-      "title": "Details [Platform: $platform, App: $appId]",
-      "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Postgres",
-      "fill": 3,
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 50
-      },
-      "id": 59,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "repeatIteration": 1522742327073,
-      "repeatPanelId": 47,
-      "repeatedByRow": true,
-      "scopedVars": {
-        "platform": {
-          "selected": false,
-          "text": "ios",
-          "value": "ios"
-        }
-      },
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": true,
-      "targets": [
-        {
-          "alias": "",
-          "format": "time_series",
-          "rawSql": "select event_time as time, sum(passed) as passed, sum(not_passed) as not_passed\nfrom (\n  SELECT event_time,\n  (select sum(case when (sec->>'passed')::boolean then 1 else 0 end)\n  from jsonb_array_elements(data->'security') as sec) as passed,\n  (select sum(case when (sec->>'passed')::boolean then 0 else 1 end)\n  from jsonb_array_elements(data->'security') as sec) as not_passed\n  FROM mobileAppMetrics as s\n  INNER JOIN (\n    SELECT DISTINCT clientId\n    FROM mobileAppMetrics\n    where data->'app'->>'appId' like $appId\n    and data->'device'->>'platform' like $platform\n  ) as a ON (s.clientId = a.clientId)\n  where $__timeFilter(event_time)\n) as check_counts\ngroup by event_time",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Metrics History",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ]
     }
   ],
   "refresh": false,
@@ -1242,20 +873,20 @@
         "auto_count": 30,
         "auto_min": "10s",
         "current": {
-          "text": "1m",
-          "value": "1m"
+          "text": "auto",
+          "value": "$__auto_interval_resolutionInterval"
         },
         "hide": 0,
         "label": "Resolution",
         "name": "resolutionInterval",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "auto",
             "value": "$__auto_interval_resolutionInterval"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "1m",
             "value": "1m"
           },
@@ -1342,5 +973,5 @@
   },
   "timezone": "",
   "title": "Mobile Security Metrics 3",
-  "version": 14
+  "version": 18
 }
